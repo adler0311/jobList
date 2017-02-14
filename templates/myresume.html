@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<h3>{{a.companyName}} 자소서 항목</h3>
+<div class = 'flash'>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+	{% for message in messages %}
+		<li> <strong> {{ message }} </strong> </li>
+	{% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+<div class="well">
+	<h4>예시:</h4>
+	<h4>1. 수강한 SW 관련 과목들이 무엇이 있었고, 그 중 흥미를 가진 과목과 수행했던 프로젝트에 대해 설명해 주세요.</h4>
+	<hr>
+	<h5>저는 알고리즘 수업이 가장 흥미로웠습니다. 분할과 정복을 방법을 사용하여 퀵 정렬과 최솟 컷 알고리즘을 구현하는 것이 무척이나 흥미로웠습니다.</h5>
+	<a class="btn btn-default" href="#" role="button">수정하기</a>
+	<a class="btn btn-default" href="#" role="button">삭제하기</a>
+</div>
+
+{% for r in resumes %}
+	<div class="well">
+		<h4>{{r.question}}</h4>
+		<hr>
+		<h5>{{r.answer}}</h5>
+		<a class="btn btn-default" href="{{url_for('editQuestion', post_id=post_id, q_id=r.id)}}" role="button">수정하기</a>
+		<a class="btn btn-default" href="{{url_for('deleteQuestion', post_id=post_id, q_id=r.id)}}" role="button">삭제하기</a>
+	</div>
+{% endfor %}
+<a class="btn btn-default" href="{{url_for('newQuestion', post_id = post_id)}}" role="button">문항 추가하기</a>
+
+
+
+{% endblock %}

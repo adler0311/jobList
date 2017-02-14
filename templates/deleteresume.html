@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+
+<h3>정말 이 문항을 삭제하시겠습니까?</h3>
+
+<form method="POST" action="{{url_for('deleteQuestion', post_id=r.announcement_id, q_id=r.id)}}">
+  	<button type="submit" class="btn btn-default">삭제하기</button>
+  	<a class="btn btn-default" href="{{url_for('resume', post_id=r.announcement_id)}}" role="button">취소</a>
+</form>
+
+{% endblock %}

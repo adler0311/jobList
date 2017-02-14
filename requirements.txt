@@ -1,0 +1,6 @@
+flask
+sqlalchemy
+oauth2client
+httplib2
+requests
+bs4

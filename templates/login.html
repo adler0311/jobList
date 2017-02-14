@@ -1,0 +1,147 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<head>
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+    <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+    <script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+</head>
+
+
+<!-- GOOGLE PLUS SIGN IN-->
+
+<div id="signInButton">
+    <span class="g-signin"
+        data-scope="openid email"
+        data-clientid="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        data-redirecturi="postmessage"
+        data-accesstype="offline"
+        data-cookiepolicy="single_host_origin"
+        data-callback="signInCallback"
+        data-approvalprompt="force">
+    </span>
+</div>
+<fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();" >
+    <a href='javascript:sendTokenToServer()'>페이스북으로 로그인</a>
+</fb:login-button>
+<a id="kakao-login-btn"></a>
+<a href="http://alpha-developers.kakao.com/logout"></a>
+
+
+<div id="result"></div>
+
+
+<script>
+function signInCallback(authResult) {
+    if (authResult['code']) {
+        // Hide the sign-in button now that the user is authorized
+        $('#signinButton').attr('style', 'display: none');
+
+        // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+        $.ajax({
+            type: 'POST',
+            url: '/gconnect?state={{STATE}}',
+            processData: false,
+            data: authResult['code'],
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(result) {
+                // Handle or verify the server response if necessary.
+                if (result) {
+                    $('#result').html(result + '</br>메인으로 이동합니다.')
+                    setTimeout(function() {
+                        window.location.href = "/";
+                    }, 3000);
+                } else if (authResult['error']) {
+                    console.log('There was an error: ' + authResult['error']);
+                } else {
+                    $('#result').html('서버측의 요청에 실패했습니다.');
+                }
+
+            }
+        });
+    }
+}
+</script>
+<!--END GOOGLE PLUS SIGN IN -->
+
+<!--FACEBOOK SIGN IN -->
+<script>
+window.fbAsyncInit = function() {
+    FB.init({
+    appId      : 'xxxxxxxxxxxxxxxxx',
+    cookie     : true,  // enable cookies to allow the server to access 
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.2' // use version 2.2
+    });
+};
+
+// Load the SDK asynchronously
+(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+// Here we run a very simple test of the Graph API after login is
+// successful.  See statusChangeCallback() for when this call is made.
+function sendTokenToServer() {
+    var access_token = FB.getAuthResponse()['accessToken'];
+    FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        $.ajax({
+            type: 'POST',
+            url: '/fbconnect?state={{STATE}}',
+            processData: false,
+            data: access_token,
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(result) {
+                // Handle or verify the server response if necessary.
+                if (result) {
+                    $('#result').html(result + '</br>메인으로 이동합니다.')
+                    setTimeout(function() {
+                        window.location.href = "/";
+                    }, 3000);
+                } else {
+                    $('#result').html('서버측의 요청에 실패했습니다.');
+                }
+            }
+        });
+    });
+}
+</script>
+<!--END FACEBOOK SIGN IN -->
+<script type='text/javascript'>
+//<![CDATA[
+// 사용할 앱의 JavaScript 키를 설정해 주세요.
+Kakao.init('xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+// 카카오 로그인 버튼을 생성합니다.
+Kakao.Auth.createLoginButton({
+    container: '#kakao-login-btn',
+    success: function(authObj) {
+        $.ajax({
+            type: 'POST',
+            url: '/kconnect?state={{STATE}}',
+            processData: false,
+            data: JSON.stringify(authObj),
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(result) {
+                // Handle or verify the server response if necessary.
+                if (result) {
+                    $('#result').html(result + '</br>메인으로 이동합니다.')
+                    setTimeout(function() {
+                        window.location.href = "/";
+                    }, 3000);
+                }
+            }
+        })
+    },
+    fail: function(err) {
+        alert(JSON.stringify(err));
+    }
+});
+    //]]>
+</script>
+{% endblock %}

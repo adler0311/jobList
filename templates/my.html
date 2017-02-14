@@ -1,0 +1,77 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div class="panel panel-default">
+	<div class="panel-heading">기업 리스트</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>기업명</th>
+				<th>공고 제목</th>
+				<th>직무</th>
+				<th>페이지 링크</th>
+				<th>기한</th>
+				<th>연봉정보</th>
+				<!--<th>추가 정보</th>-->
+				<th>즐겨찾기 취소</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for d in data %}
+			<tr>
+				<th>{{loop.index}}</th>
+				<td><a href="{{url_for('resume', post_id = d.id)}}" data-toggle="tooltip" data-placement="top" title="자소서 쓰러 가기">{{d.companyName}}</a></td>
+				<td>{{d.title}}</td>
+				<td>{{d.position}}</td>
+				<td><a href={{d.pageLink}}>보러가기</a></td>
+				<td>{{d.dueDate}}</td>
+				<td>
+					{% if d.payment is not none %}
+						{{'%d'|format(d.payment/10000) }}만원
+					{% else %}
+						<a href="https://kreditjob.com/">직접 찾기</a>
+					{% endif %}
+				</td>
+				<!--<td><a href="#" data-toggle="tooltip" data-placement="top" title="추가하기">없음</a></td>-->
+				<td><a href="#" class='cancel'>취소</a></td>
+				<td class="hidden" hidden>{{d.id}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+$(function () {
+    //$("[rel='tooltip']").tooltip();
+    $('.cancel').click(function() {
+    	var $this = $(this)
+    	var aId = $this.parent().siblings(".hidden").text()
+		$.confirm({
+		    title: '',
+		    content: '즐겨찾기에서 제거하시겠습니까?',
+		    buttons: {
+		        confirm: function () {
+		            $this.parent().parent().remove();
+    				$.ajax({
+    					type: 'POST',
+    					url: 'deleteFavorite',
+    					data: {'aId':aId},
+    					success: function(result) {
+    						alert(result)
+    					}
+    				});
+		        },
+		        cancel: function () {
+		        }
+		    }
+		});
+    });
+});
+
+
+</script>
+{% endblock %}

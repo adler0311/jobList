@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div class = 'flash'>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+	{% for message in messages %}
+		<li> <strong> {{ message }} </strong> </li>
+	{% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+<div id = 'listDiv'></div>
+<button type="button" id='listButton' class="btn btn-default navbar-btn">가져오기</button>
+
+
+<script>
+$(function() {
+	$('#listButton').click(function() {
+		$.ajax({
+			type: 'POST',
+			url: '/fetchingpublic',
+			dataType: 'html',
+			success: function(data) {
+				$.alert({
+   					title: '알림',
+    				content: '공고 리스트를 가져왔습니다.',
+				});
+				$('#listDiv').html(data)
+			}
+		});
+	});
+})
+</script>
+
+{% endblock %}
